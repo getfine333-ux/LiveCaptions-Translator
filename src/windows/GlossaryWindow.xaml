@@ -1,0 +1,55 @@
+<Window x:Class="LiveCaptionsTranslator.GlossaryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="术语表" Width="860" Height="690" MinWidth="660" MinHeight="550" FontFamily="Microsoft YaHei UI" FontSize="14"
+        WindowStartupLocation="CenterOwner" Background="{DynamicResource ApplicationBackgroundBrush}"
+        Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+    <Grid Margin="22">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel>
+            <TextBlock x:Name="Heading" Text="为这次工作准备术语" FontSize="21" FontWeight="SemiBold"/>
+            <TextBlock x:Name="ProviderText" Margin="0,6,0,18" TextWrapping="Wrap" Opacity="0.75"/>
+        </StackPanel>
+        <StackPanel Grid.Row="1">
+            <TextBlock x:Name="TopicLabel" Text="本次工作涉及什么领域？" Margin="0,0,0,6"/>
+            <TextBox x:Name="TopicBox" AutomationProperties.AutomationId="GlossaryTopic"
+                     Height="70" MaxLength="1500" Padding="10,7" AcceptsReturn="True"
+                     TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
+            <TextBlock x:Name="ExampleText" Margin="0,6,0,12" Opacity="0.65" TextWrapping="Wrap"
+                       Text="例如：半导体光刻，重点是掩膜板、晶圆、衍射和先进制程。"/>
+        </StackPanel>
+        <StackPanel Grid.Row="2">
+            <WrapPanel Margin="0,0,0,14">
+                <Button x:Name="GenerateButton" AutomationProperties.AutomationId="GenerateGlossary"
+                        Content="生成草稿" Padding="16,7" Margin="0,0,10,0" Click="Generate_Click"/>
+                <Button x:Name="CancelButton" Content="取消生成" Padding="12,7" Margin="0,0,16,0"
+                        Visibility="Collapsed" Click="Cancel_Click"/>
+                <CheckBox x:Name="MergeBox" Content="合并已有术语，同名保留原译法" IsChecked="True" VerticalAlignment="Center"/>
+            </WrapPanel>
+            <TextBlock x:Name="EditorLabel" Text="术语草稿 · 可直接编辑，每行「原文 = 译文」" Margin="0,0,0,7"/>
+        </StackPanel>
+        <TextBox Grid.Row="3" x:Name="EditorBox" AutomationProperties.AutomationId="GlossaryEditor"
+                 MinHeight="120" Padding="12" AcceptsReturn="True" AcceptsTab="True"
+                 FontFamily="Consolas, Microsoft YaHei UI" FontSize="14" TextWrapping="Wrap"
+                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                 TextChanged="Editor_Changed"/>
+        <Grid Grid.Row="4" Margin="0,12,0,0">
+            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+            <TextBlock x:Name="StatusText" TextWrapping="Wrap" MinHeight="36" Margin="0,0,0,8"/>
+            <DockPanel Grid.Row="1" LastChildFill="True">
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="12,0,0,0">
+                    <Button x:Name="CloseButton" Content="关闭" Padding="16,8" Margin="0,0,10,0" Click="Close_Click"/>
+                    <Button x:Name="SaveButton" AutomationProperties.AutomationId="SaveGlossary" Content="保存并应用" Padding="16,8" Click="Save_Click"/>
+                </StackPanel>
+                <TextBlock x:Name="SaveHint" VerticalAlignment="Center" Opacity="0.65" TextWrapping="Wrap"
+                           Text="保存后用于后续字幕，生成草稿不会修改原文件。"/>
+            </DockPanel>
+        </Grid>
+    </Grid>
+</Window>

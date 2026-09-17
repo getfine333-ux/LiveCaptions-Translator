@@ -1,0 +1,6 @@
+# Copy to glossary.txt, or generate a domain glossary from the application.
+# Format: source = target
+数值孔径 = numerical aperture
+浸没式光刻 = immersion lithography
+掩膜板 = photomask
+晶圆 = wafer

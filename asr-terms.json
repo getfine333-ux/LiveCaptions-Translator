@@ -1,0 +1,44 @@
+[
+  {
+    "term": "被奉为圭臬",
+    "translation": "regarded as authoritative",
+    "aliases": ["被分为龟镍", "被奉为龟镍"],
+    "requireAny": ["公式", "定律", "准则", "标准"],
+    "excludeAny": ["化学", "金属", "人名", "名字", "原文写着", "原话是", "错别字"]
+  },
+  {
+    "term": "掩膜板",
+    "translation": "photomask",
+    "aliases": ["眼磨板", "眼膜板", "眼模板", "演膜板", "演模板"],
+    "requireAny": ["光刻", "波动光学", "衍射", "光波", "平行光", "掩膜", "掩模", "缝隙", "光斑"],
+    "excludeAny": ["眼科", "眼球", "眼睑", "美妆", "面膜", "化妆", "人名", "名字"]
+  },
+  {
+    "term": "晶圆",
+    "translation": "wafer",
+    "aliases": ["金圆", "金元", "晶元"],
+    "requireAny": ["光刻", "掩膜", "掩模", "光波", "曝光", "制程", "晶圆"],
+    "excludeAny": ["金元时期", "金元朝", "金元时代", "朝代", "历史", "金币", "货币", "人民币", "人名", "名字"]
+  },
+  {
+    "term": "零级衍射",
+    "translation": "zero-order diffraction",
+    "aliases": ["灵机眼射", "零级眼射", "零级演射", "零级颜射"],
+    "requireAny": ["光斑", "衍射", "光波", "光刻", "零频率"],
+    "excludeAny": ["人名", "名字"]
+  },
+  {
+    "term": "衍射",
+    "translation": "diffraction",
+    "aliases": ["演射", "眼射", "颜射"],
+    "requireAny": ["光斑", "光波", "光刻", "掩膜", "掩模", "缝隙", "衍射"],
+    "excludeAny": ["眼科", "眼球", "人名", "名字"]
+  },
+  {
+    "term": "光波",
+    "translation": "light wave",
+    "aliases": ["光播"],
+    "requireAny": ["光刻", "掩膜", "掩模", "光波", "平行光", "衍射", "波动光学"],
+    "excludeAny": ["广播", "电台", "人名", "名字"]
+  }
+]

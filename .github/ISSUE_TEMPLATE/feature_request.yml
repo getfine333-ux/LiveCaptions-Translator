@@ -1,0 +1,16 @@
+name: Feature request / 功能建议
+description: Suggest an improvement.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Need / 使用需求
+      description: Describe the task without confidential names or recordings.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Suggested behavior / 建议效果
+    validations:
+      required: true

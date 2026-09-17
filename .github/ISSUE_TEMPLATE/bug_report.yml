@@ -1,0 +1,39 @@
+name: Bug report / 问题反馈
+description: Report a reproducible problem without private data.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        中文或 English 均可。请先搜索本仓库已有问题。
+        Do not attach setting.json, API keys, real transcripts, audio or unredacted screenshots.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and expected behavior / 问题与期望
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction / 复现步骤
+      description: Use a short synthetic example; describe actual and expected behavior.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: App version and Windows version / 程序与系统版本
+    validations:
+      required: true
+  - type: textarea
+    id: mode
+    attributes:
+      label: Recognition and translation mode / 识别与翻译模式
+      description: Provider/model names, audio source and thread count only. No keys, private URLs or full configuration.
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy / 隐私
+      options:
+        - label: I removed credentials and personal content from this report. / 已移除密钥与个人内容。
+          required: true

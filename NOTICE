@@ -1,0 +1,13 @@
+LiveCaptions Translator
+Derived from https://github.com/SakiRinn/LiveCaptions-Translator
+Upstream reference: 794f442
+Copyright (c) 2024 SakiRinn and other contributors.
+
+This distribution contains modifications described in CHANGES.md, including
+local audio recognition, semantic segmentation, ordered translation and caption
+reading, terminology tools, explicit settings persistence, and release privacy
+controls. It is not an official release by the upstream maintainers.
+
+Original source attribution is retained. Application source is licensed under
+Apache License 2.0 (LICENSE). Third-party libraries and separately downloaded
+models retain their own licenses and notices.

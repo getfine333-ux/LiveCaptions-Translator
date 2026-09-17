@@ -1,0 +1,12 @@
+name: Usage help / 使用帮助
+description: Ask about setup or usage.
+body:
+  - type: markdown
+    attributes:
+      value: Read README first. Never post keys, full configs or private recordings.
+  - type: textarea
+    id: question
+    attributes:
+      label: Question / 问题
+    validations:
+      required: true

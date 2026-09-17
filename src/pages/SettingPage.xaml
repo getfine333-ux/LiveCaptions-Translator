@@ -1,0 +1,511 @@
+<!-- Modified derivative; see CHANGES.md. Original upstream attribution is retained in NOTICE. -->
+<Page
+    x:Class="LiveCaptionsTranslator.SettingPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:LiveCaptionsTranslator"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Title="SettingPage"
+    JournalEntry.KeepAlive="True"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <Style x:Key="InfoButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="16" />
+            <Setter Property="Height" Value="16" />
+            <Setter Property="Margin" Value="5,-2,0,0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Focusable" Value="False" />
+            <EventSetter Event="MouseEnter" Handler="Info_MouseEnter" />
+            <EventSetter Event="MouseLeave" Handler="Info_MouseLeave" />
+            <EventSetter Event="Click" Handler="Info_Click" />
+        </Style>
+        <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+            <Setter Property="Margin" Value="2.5,0,0,5" />
+        </Style>
+    </Page.Resources>
+
+    <DockPanel>
+        <Border DockPanel.Dock="Top" Margin="15,12,15,0" Padding="0,0,0,10" BorderThickness="0,0,0,1" BorderBrush="#20888888">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <ui:Button x:Name="SaveSettingsButton" AutomationProperties.AutomationId="SaveSettings"
+                        Content="保存并应用" Appearance="Primary" Padding="14,6" Click="SaveSettings_Click" />
+                    <ui:Button x:Name="RevertSettingsButton" Content="撤销修改" Padding="14,6" Margin="8,0,0,0" Click="RevertSettings_Click" />
+                </StackPanel>
+                <TextBlock x:Name="SaveStatus" TextWrapping="Wrap" Margin="0,8,0,0" FontSize="12" Opacity="0.7" />
+            </StackPanel>
+        </Border>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="15">
+            <StackPanel x:Name="SettingsForm">
+
+                <!--  Language toggle  -->
+                <DockPanel Margin="0,0,0,10">
+                    <ui:Button
+                        x:Name="LangToggle"
+                        DockPanel.Dock="Right"
+                        Width="120"
+                        Height="30"
+                        Padding="11,4,11,4"
+                        Click="LangToggle_Click" />
+                </DockPanel>
+
+                <!--  ================= 语音识别 / Speech Recognition  =================  -->
+                <TextBlock
+                    x:Name="SecSpeech"
+                    Margin="2.5,0,0,8"
+                    FontSize="14"
+                    FontWeight="SemiBold" />
+                <WrapPanel>
+
+                    <StackPanel Margin="0,0,16,10" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="LblAudioSource" Style="{StaticResource FieldLabelStyle}" />
+                            <Button x:Name="InfoAudioSource" Style="{StaticResource InfoButtonStyle}">
+                                <ui:SymbolIcon Symbol="Info16" />
+                            </Button>
+                        </StackPanel>
+                        <ComboBox
+                            x:Name="AudioInputBox"
+                            Width="130"
+                            Height="30"
+                            Padding="10,4,10,7"
+                            SelectionChanged="AudioInputBox_SelectionChanged">
+                            <ComboBoxItem x:Name="AudioMicItem" Tag="microphone" />
+                            <ComboBoxItem x:Name="AudioSysItem" Tag="system" />
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,16,10" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="LblAsrEngine" Style="{StaticResource FieldLabelStyle}" />
+                            <Button x:Name="InfoAsrEngine" Style="{StaticResource InfoButtonStyle}">
+                                <ui:SymbolIcon Symbol="Info16" />
+                            </Button>
+                        </StackPanel>
+                        <ComboBox
+                            x:Name="AsrProviderBox"
+                            Width="160"
+                            Height="30"
+                            Padding="10,4,10,7"
+                            SelectionChanged="AsrProviderBox_SelectionChanged">
+                            <ComboBoxItem x:Name="AsrLocalItem" Tag="local" />
+                            <ComboBoxItem x:Name="AsrOtherItem" Tag="other" />
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,16,10" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="LblAsrModel" Style="{StaticResource FieldLabelStyle}" />
+                            <Button x:Name="InfoAsrModel" Style="{StaticResource InfoButtonStyle}">
+                                <ui:SymbolIcon Symbol="Info16" />
+                            </Button>
+                        </StackPanel>
+                        <ComboBox
+                            x:Name="AsrModelBox"
+                            DisplayMemberPath="DisplayName"
+                            ToolTip="{Binding SelectedItem.DirectoryPath, ElementName=AsrModelBox}"
+                            Width="250"
+                            Height="30"
+                            Padding="10,4,10,7"
+                            SelectionChanged="AsrModelBox_SelectionChanged">
+                            <ComboBox.ItemContainerStyle>
+                                <Style TargetType="ComboBoxItem">
+                                    <Setter Property="ToolTip" Value="{Binding DirectoryPath}" />
+                                    <Setter Property="IsEnabled" Value="{Binding Available}" />
+                                </Style>
+                            </ComboBox.ItemContainerStyle>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,16,10" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="LblAsrThreads" Style="{StaticResource FieldLabelStyle}" />
+                            <Button x:Name="InfoAsrThreads" Style="{StaticResource InfoButtonStyle}">
+                                <ui:SymbolIcon Symbol="Info16" />
+                            </Button>
+                        </StackPanel>
+                        <ui:NumberBox
+                            x:Name="AsrThreadsBox"
+                            Width="110"
+                            Height="30"
+                            Padding="10,4,10,7"
+                            AcceptsExpression="False"
+                            ClearButtonEnabled="False"
+                            Maximum="32"
+                            Minimum="1"
+                            SpinButtonPlacementMode="Inline"
+                            ValueChanged="AsrThreadsBox_ValueChanged" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,16,10" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="LblVadSilence" Style="{StaticResource FieldLabelStyle}" />
+                            <Button x:Name="InfoVadSilence" Style="{StaticResource InfoButtonStyle}">
+                                <ui:SymbolIcon Symbol="Info16" />
+                            </Button>
+                        </StackPanel>
+                        <ui:NumberBox
+                            x:Name="VadMinSilenceBox"
+                            Width="130"
+                            Height="30"
+                            Padding="10,4,10,7"
+                            AcceptsExpression="False"
+                            ClearButtonEnabled="False"
+                            Maximum="3"
+                            Minimum="0.2"
+                            SmallChange="0.1"
+                            SpinButtonPlacementMode="Inline"
+                            ValueChanged="VadMinSilenceBox_ValueChanged" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,16,10" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="LblVadMaxSpeech" Style="{StaticResource FieldLabelStyle}" />
+                            <Button x:Name="InfoVadMaxSpeech" Style="{StaticResource InfoButtonStyle}">
+                                <ui:SymbolIcon Symbol="Info16" />
+                            </Button>
+                        </StackPanel>
+                        <ui:NumberBox
+                            x:Name="VadMaxSpeechBox"
+                            Width="130"
+                            Height="30"
+                            Padding="10,4,10,7"
+                            AcceptsExpression="False"
+                            ClearButtonEnabled="False"
+                            Maximum="30"
+                            Minimum="3"
+                            SpinButtonPlacementMode="Inline"
+                            ValueChanged="VadMaxSpeechBox_ValueChanged" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,16,10" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="LblCorrect" Style="{StaticResource FieldLabelStyle}" />
+                            <Button x:Name="InfoCorrect" Style="{StaticResource InfoButtonStyle}">
+                                <ui:SymbolIcon Symbol="Info16" />
+                            </Button>
+                        </StackPanel>
+                        <ui:ToggleSwitch
+                            x:Name="CorrectAsrErrorsBox"
+                            Width="90"
+                            Height="30"
+                            Padding="10,4,10,7"
+                            Checked="CorrectAsrErrorsBox_Changed"
+                            OffContent="Off"
+                            OnContent="On"
+                            Unchecked="CorrectAsrErrorsBox_Changed" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,16,10" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="LblGlossary" Style="{StaticResource FieldLabelStyle}" />
+                            <Button x:Name="InfoGlossary" Style="{StaticResource InfoButtonStyle}">
+                                <ui:SymbolIcon Symbol="Info16" />
+                            </Button>
+                        </StackPanel>
+                        <ui:Button
+                            x:Name="GlossaryButton"
+                            AutomationProperties.AutomationId="OpenGlossary"
+                            Width="130"
+                            Height="30"
+                            Padding="11,4,11,4"
+                            ToolTip="使用已保存的 AI 设置；术语表在编辑器中保存后生效。"
+                            Click="GlossaryButton_click" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,16,10" Orientation="Vertical">
+                        <TextBlock x:Name="LblLiveCaptions" Style="{StaticResource FieldLabelStyle}" />
+                        <ui:Button
+                            x:Name="LiveCaptionsButton"
+                            Width="110"
+                            Height="30"
+                            Padding="11,4,11,4"
+                            Click="LiveCaptionsButton_click">
+                            <TextBlock x:Name="ButtonText" Text="Show" />
+                        </ui:Button>
+                    </StackPanel>
+
+                </WrapPanel>
+
+                <!--  ================= 翻译 / Translation  =================  -->
+                <TextBlock
+                    x:Name="SecTranslate"
+                    Margin="2.5,10,0,8"
+                    FontSize="14"
+                    FontWeight="SemiBold" />
+                <WrapPanel>
+
+                    <StackPanel Margin="0,0,16,10" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="LblTrApi" Style="{StaticResource FieldLabelStyle}" />
+                            <Button x:Name="InfoTrApi" Style="{StaticResource InfoButtonStyle}">
+                                <ui:SymbolIcon Symbol="Info16" />
+                            </Button>
+                        </StackPanel>
+                        <ComboBox
+                            x:Name="TranslateAPIBox"
+                            Width="150"
+                            Height="30"
+                            Padding="10,4,10,7"
+                            FontSize="13.3"
+                            SelectionChanged="TranslateAPIBox_SelectionChanged" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,16,10" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="LblTrDirection" Style="{StaticResource FieldLabelStyle}" />
+                            <Button x:Name="InfoTrDirection" Style="{StaticResource InfoButtonStyle}">
+                                <ui:SymbolIcon Symbol="Info16" />
+                            </Button>
+                        </StackPanel>
+                        <ComboBox
+                            x:Name="DirectionBox"
+                            Width="150"
+                            Height="30"
+                            Padding="10,4,10,7"
+                            SelectionChanged="DirectionBox_SelectionChanged">
+                            <ComboBoxItem x:Name="DirZh2EnItem" Tag="zh2en" />
+                            <ComboBoxItem x:Name="DirEn2ZhItem" Tag="en2zh" />
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,16,10" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="LblTrTarget" Style="{StaticResource FieldLabelStyle}" />
+                            <Button x:Name="InfoTrTarget" Style="{StaticResource InfoButtonStyle}">
+                                <ui:SymbolIcon Symbol="Info16" />
+                            </Button>
+                        </StackPanel>
+                        <ComboBox
+                            x:Name="TargetLangBox"
+                            Width="150"
+                            Height="30"
+                            Padding="10,4,10,7"
+                            FontSize="13.3"
+                            IsEditable="True"
+                            LostFocus="TargetLangBox_LostFocus"
+                            SelectionChanged="TargetLangBox_SelectionChanged" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,16,10" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="LblTrBaseUrl" Style="{StaticResource FieldLabelStyle}" />
+                            <Button x:Name="InfoTrBaseUrl" Style="{StaticResource InfoButtonStyle}">
+                                <ui:SymbolIcon Symbol="Info16" />
+                            </Button>
+                        </StackPanel>
+                        <TextBox
+                            x:Name="BaseUrlBox"
+                            Width="300"
+                            Height="30"
+                            Padding="10,4,10,7"
+                            VerticalContentAlignment="Center"
+                            TextChanged="ConfigText_Changed"
+                            LostFocus="BaseUrlBox_LostFocus" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,16,10" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="LblTrApiKey" Style="{StaticResource FieldLabelStyle}" />
+                            <Button x:Name="InfoTrApiKey" Style="{StaticResource InfoButtonStyle}">
+                                <ui:SymbolIcon Symbol="Info16" />
+                            </Button>
+                        </StackPanel>
+                        <TextBox
+                            x:Name="ApiKeyBox"
+                            Width="260"
+                            Height="30"
+                            Padding="10,4,10,7"
+                            VerticalContentAlignment="Center"
+                            TextChanged="ConfigText_Changed"
+                            LostFocus="ApiKeyBox_LostFocus" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,16,10" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="LblTrModel" Style="{StaticResource FieldLabelStyle}" />
+                            <Button x:Name="InfoTrModel" Style="{StaticResource InfoButtonStyle}">
+                                <ui:SymbolIcon Symbol="Info16" />
+                            </Button>
+                        </StackPanel>
+                        <TextBox
+                            x:Name="ModelBox"
+                            Width="180"
+                            Height="30"
+                            Padding="10,4,10,7"
+                            VerticalContentAlignment="Center"
+                            TextChanged="ConfigText_Changed"
+                            LostFocus="ModelBox_LostFocus" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,16,10" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="LblTrTemperature" Style="{StaticResource FieldLabelStyle}" />
+                            <Button x:Name="InfoTrTemperature" Style="{StaticResource InfoButtonStyle}">
+                                <ui:SymbolIcon Symbol="Info16" />
+                            </Button>
+                        </StackPanel>
+                        <ui:NumberBox
+                            x:Name="TemperatureBox"
+                            Width="130"
+                            Height="30"
+                            Padding="10,4,10,7"
+                            AcceptsExpression="False"
+                            ClearButtonEnabled="False"
+                            Maximum="2"
+                            Minimum="0"
+                            SmallChange="0.1"
+                            SpinButtonPlacementMode="Inline"
+                            ValueChanged="TemperatureBox_ValueChanged" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,16,10" Orientation="Vertical">
+                        <TextBlock x:Name="LblTrTest" Style="{StaticResource FieldLabelStyle}" />
+                        <ui:Button
+                            x:Name="TestButton"
+                            Width="110"
+                            Height="30"
+                            Padding="11,4,11,4"
+                            ToolTip="使用当前填写的参数测试连接，不会应用或保存这些设置。"
+                            Click="TestConnection_Click" />
+                    </StackPanel>
+
+                </WrapPanel>
+
+                <!--  ================= 字幕显示 / Caption Display  =================  -->
+                <TextBlock
+                    x:Name="SecCaption"
+                    Margin="2.5,10,0,8"
+                    FontSize="14"
+                    FontWeight="SemiBold" />
+                <WrapPanel>
+
+                    <StackPanel Margin="0,0,16,10" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="LblContexts" Style="{StaticResource FieldLabelStyle}" />
+                            <Button x:Name="InfoContexts" Style="{StaticResource InfoButtonStyle}">
+                                <ui:SymbolIcon Symbol="Info16" />
+                            </Button>
+                        </StackPanel>
+                        <ui:NumberBox
+                            x:Name="ContextsBox"
+                            Width="130"
+                            Height="30"
+                            Padding="10,4,10,7"
+                            AcceptsExpression="False"
+                            ClearButtonEnabled="False"
+                            Maximum="10"
+                            Minimum="1"
+                            SpinButtonPlacementMode="Inline"
+                            ValueChanged="Contexts_ValueChanged" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,16,10" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="LblDisplaySentences" Style="{StaticResource FieldLabelStyle}" />
+                            <Button x:Name="InfoDisplaySentences" Style="{StaticResource InfoButtonStyle}">
+                                <ui:SymbolIcon Symbol="Info16" />
+                            </Button>
+                        </StackPanel>
+                        <ui:NumberBox
+                            x:Name="DisplaySentencesBox"
+                            Visibility="Collapsed"
+                            Width="130"
+                            Height="30"
+                            Padding="10,4,10,7"
+                            AcceptsExpression="False"
+                            ClearButtonEnabled="False"
+                            Maximum="6"
+                            Minimum="0"
+                            SpinButtonPlacementMode="Inline"
+                            ValueChanged="DisplaySentences_ValueChanged" />
+                        <TextBlock x:Name="LblReadingArea" Width="130" Height="30" VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,16,10" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="LblContextAware" Style="{StaticResource FieldLabelStyle}" />
+                            <Button x:Name="InfoContextAware" Style="{StaticResource InfoButtonStyle}">
+                                <ui:SymbolIcon Symbol="Info16" />
+                            </Button>
+                        </StackPanel>
+                        <ui:ToggleSwitch
+                            x:Name="ContextAwareBox"
+                            Width="90"
+                            Height="30"
+                            Padding="10,4,10,7"
+                            Checked="ContextAwareBox_Changed"
+                            OffContent="Off"
+                            OnContent="On"
+                            Unchecked="ContextAwareBox_Changed" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,16,10" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="LblLatency" Style="{StaticResource FieldLabelStyle}" />
+                            <Button x:Name="InfoLatency" Style="{StaticResource InfoButtonStyle}">
+                                <ui:SymbolIcon Symbol="Info16" />
+                            </Button>
+                        </StackPanel>
+                        <ui:ToggleSwitch
+                            x:Name="LatencyBox"
+                            Width="90"
+                            Height="30"
+                            Padding="10,4,10,7"
+                            Checked="LatencyBox_Changed"
+                            OffContent="Off"
+                            OnContent="On"
+                            Unchecked="LatencyBox_Changed" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,16,10" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="LblApiInterval" Style="{StaticResource FieldLabelStyle}" />
+                            <Button x:Name="InfoApiInterval" Style="{StaticResource InfoButtonStyle}">
+                                <ui:SymbolIcon Symbol="Info16" />
+                            </Button>
+                        </StackPanel>
+                        <Slider
+                            x:Name="ApiIntervalSlider"
+                            Width="130"
+                            AutoToolTipPlacement="TopLeft"
+                            AutoToolTipPrecision="0"
+                            Maximum="10"
+                            ValueChanged="ApiIntervalSlider_ValueChanged" />
+                    </StackPanel>
+
+                </WrapPanel>
+
+                <Popup
+                    x:Name="InfoPopup"
+                    AllowsTransparency="True"
+                    Placement="Bottom"
+                    PopupAnimation="Fade"
+                    StaysOpen="True">
+                    <Border
+                        MaxWidth="360"
+                        Padding="12"
+                        Background="{DynamicResource ApplicationBackgroundBrush}"
+                        BorderBrush="#30808080"
+                        BorderThickness="1"
+                        CornerRadius="6">
+                        <TextBlock
+                            x:Name="InfoPopupText"
+                            FontSize="13"
+                            LineHeight="19"
+                            TextWrapping="Wrap" />
+                    </Border>
+                </Popup>
+
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+    </DockPanel>
+</Page>

@@ -1,0 +1,26 @@
+{
+  "AudioSource": "microphone",
+  "AudioInput": "system",
+  "AsrProvider": "local",
+  "AsrModelDir": "models/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17",
+  "AsrThreads": 4,
+  "VadMinSilence": 0.6,
+  "VadMaxSpeech": 8,
+  "TranslationMode": "zh2en",
+  "SourceLang": "zh-CN",
+  "TargetLanguage": "en-US",
+  "UiLanguage": "zh",
+  "CorrectAsrErrors": true,
+  "ContextAware": true,
+  "GlossaryFile": "glossary.txt",
+  "SessionSaveDir": "transcripts",
+  "ApiName": "OpenAI",
+  "Configs": {
+    "OpenAI": [{
+      "ApiUrl": "https://api.deepseek.com/chat/completions",
+      "ApiKey": "${DEEPSEEK_API_KEY}",
+      "ModelName": "deepseek-chat",
+      "Temperature": 0.2
+    }]
+  }
+}

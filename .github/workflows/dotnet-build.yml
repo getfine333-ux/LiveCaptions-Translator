@@ -1,0 +1,98 @@
+name: Build, test and package
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Install Gitleaks with checksum verification
+        run: |
+          $version = '8.30.1'
+          $name = "gitleaks_${version}_windows_x64.zip"
+          $base = "https://github.com/gitleaks/gitleaks/releases/download/v$version"
+          $directory = Join-Path $env:RUNNER_TEMP 'gitleaks'
+          New-Item -ItemType Directory -Path $directory | Out-Null
+          $archive = Join-Path $directory $name
+          Invoke-WebRequest "$base/$name" -OutFile $archive
+          $checksums = (Invoke-WebRequest "$base/gitleaks_${version}_checksums.txt").Content
+          $line = @($checksums -split '\r?\n' | Where-Object { $_ -match ([regex]::Escape($name) + '$') })
+          if ($line.Count -ne 1) { throw 'Expected exactly one checksum' }
+          $expected = ($line[0] -split '\s+')[0]
+          if ($expected -ne 'd29144deff3a68aa93ced33dddf84b7fdc26070add4aa0f4513094c8332afc4e') { throw 'Release checksum changed' }
+          if ((Get-FileHash $archive -Algorithm SHA256).Hash -ne $expected) { throw 'Checksum mismatch' }
+          Expand-Archive -LiteralPath $archive -DestinationPath $directory
+          $directory | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: Check public content
+        run: |
+          python scripts/test-public-source.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python scripts/check-public-source.py --root .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          gitleaks git . --redact=100 --no-banner --log-opts="--all"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./prepare-open-source.ps1
+      - name: Offline regression tests
+        run: |
+          dotnet restore tests/PipelineTests.csproj
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet run --project tests/PipelineTests.csproj -c Release --no-restore -- --ci
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build portable package
+        run: ./package-portable.ps1
+      - name: Collect public assets only
+        run: |
+          New-Item -ItemType Directory -Path artifacts/release | Out-Null
+          Get-ChildItem artifacts/open-source,artifacts/portable -Recurse -Filter '*.zip' |
+            Copy-Item -Destination artifacts/release
+          Get-ChildItem artifacts/release -Filter '*.zip' | ForEach-Object {
+            ((Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() + '  ' + $_.Name)
+          } | Set-Content artifacts/release/SHA256SUMS.txt -Encoding ascii
+      - uses: actions/upload-artifact@v4
+        with:
+          name: public-release-assets
+          path: artifacts/release/*
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: public-release-assets
+          path: release
+      - uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          files: |
+            release/LiveCaptionsTranslator-source.zip
+            release/LiveCaptionsTranslator-win-x64.zip
+            release/SHA256SUMS.txt
