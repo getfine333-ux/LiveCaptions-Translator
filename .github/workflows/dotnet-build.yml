@@ -37,7 +37,9 @@ jobs:
           New-Item -ItemType Directory -Path $directory | Out-Null
           $archive = Join-Path $directory $name
           Invoke-WebRequest "$base/$name" -OutFile $archive
-          $checksums = (Invoke-WebRequest "$base/gitleaks_${version}_checksums.txt").Content
+          $checksumFile = Join-Path $directory 'checksums.txt'
+          Invoke-WebRequest "$base/gitleaks_${version}_checksums.txt" -OutFile $checksumFile
+          $checksums = Get-Content -LiteralPath $checksumFile -Raw -Encoding utf8
           $line = @($checksums -split '\r?\n' | Where-Object { $_ -match ([regex]::Escape($name) + '$') })
           if ($line.Count -ne 1) { throw 'Expected exactly one checksum' }
           $expected = ($line[0] -split '\s+')[0]
